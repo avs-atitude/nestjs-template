@@ -1,0 +1,30 @@
+version: '3.8'
+services:
+  db:
+    image: mariadb:latest
+    restart: always
+    ports:
+      - "$DB_PORT:3306"
+    environment:
+      MYSQL_DATABASE: $DB_NAME
+      MYSQL_USER: $DB_USER
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./docker/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    ports:
+      - "8083:80"
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: $DB_PASS
+      MYSQL_USER: $DB_USER
+    depends_on:
+      - db
+
+volumes:
+  db_data:
